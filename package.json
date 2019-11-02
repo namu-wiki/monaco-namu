@@ -1,0 +1,18 @@
+{
+  "name": "monaco-namu",
+  "version": "1.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:namu-wiki/monaco-namu.git"
+  },
+  "author": "umanle S.R.L.",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/namu-wiki/monaco-namu/issues"
+  },
+  "homepage": "https://github.com/namu-wiki/monaco-namu",
+  "dependencies": {
+    "monaco-editor": "^0.18.1"
+  }
+}

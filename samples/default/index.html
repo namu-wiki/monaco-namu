@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+    <head>
+        <style>
+            html {
+                -webkit-text-size-adjust: none;
+                box-sizing: border-box;
+                font-size: 16px;
+                font-family: Open Sans,arial,Apple SD Gothic Neo,Noto Sans CJK KR,본고딕,KoPubDotum Medium,나눔바른고딕,나눔고딕,NanumGothic,맑은고딕,Malgun Gothic,sans-serif;
+            }
+            body {
+                max-width: 1300px;
+                margin: 0 auto;
+            }
+            * {
+                box-sizing: inherit;
+            }
+            :focus {
+                outline: none;
+            }
+            form div.c {
+                border: 1px solid #ddd;
+                border-top: none;
+            }
+            form div.c > div.a {
+                display: block;
+            }
+            form textarea {
+                font-family: Open Sans,arial,Apple SD Gothic Neo,Noto Sans CJK KR,본고딕,KoPubDotum Medium,나눔바른고딕,나눔고딕,NanumGothic,맑은고딕,Malgun Gothic,sans-serif;
+                color: #55595c;
+                font-size: .9rem;
+                margin: 0;
+                border-radius: 0;
+                padding: .25rem .5rem;
+                width: 100%;
+                height: 30rem;
+                border: none;
+                resize: vertical;
+            }
+            form ul {
+                height: 36px;
+                padding-left: 0;
+                margin-bottom: 0;
+                list-style: none;
+                border-bottom: 1px solid #ddd;
+                margin-top: 0;
+            }
+            form ul:after, form ul:before {
+                display: table;
+                content: " ";
+            }
+            form li {
+                float: left;
+                margin-bottom: -1px;
+            }
+            form li+li {
+                margin-left: .2rem;
+            }
+            form li button {
+                background: 0 0;
+                cursor: pointer;
+                font-size: .9rem;
+                display: block;
+                padding: .5em 1em;
+                border: 1px solid transparent;
+                border-radius: .25rem .25rem 0 0;
+            }
+            form li button.a {
+                color: #55595c;
+                background-color: #fff;
+                border-color: #ddd #ddd transparent;
+            }
+            .editor_toolbox {
+                float: right;
+            }
+            .editor_toolbox > div {
+                display: inline-block;
+            }
+        </style>
+        <script src="../../node_modules/monaco-editor/min/vs/loader.js"></script>
+        <script src="./monaco-namu.js"></script>
+    </head>
+    <body>
+        <form>
+            <h1>Uman Editor</h1>
+            <ul>
+                <li>
+                    <button class="a">편집</button>
+                </li>
+                <li>
+                    <button class="">미리보기</button>
+                </li>
+                <li class="editor_toolbox">
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:&quot;'''&quot;}">굵게</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:&quot;''&quot;}">기울임</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:&quot;--&quot;}">취소선</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:{&quot;open&quot;:&quot;[[&quot;,&quot;close&quot;:&quot;]]&quot;}}">링크</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:{&quot;open&quot;:&quot;[[파일:&quot;,&quot;close&quot;:&quot;]]&quot;}}">파일</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:{&quot;open&quot;:&quot;[* &quot;,&quot;close&quot;:&quot;]&quot;}}">각주</button>
+                    </div>
+                    <div>
+                        <button type="button" data-editor-job="{&quot;bracket&quot;:{&quot;open&quot;:&quot;[include(&quot;,&quot;close&quot;:&quot;)]&quot;}}">틀</button>
+                    </div>
+                </li>
+            </ul>
+            <div class="c">
+                <div class="a">
+                    <textarea name="text" wrap="soft"></textarea>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>
