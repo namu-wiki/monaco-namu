@@ -101,24 +101,43 @@ export default function() {
                 /* 링크 */
                 [/(\[\[)(.*?)(\|?)(.*?)(\]\])/, ['keyword', 'string.link', 'keyword', 'string', 'keyword']],
 
-                /* 그거 */
-                [/(\{{3})(?:(\#\!)(\w+))?/, {
+                /* code */
+                [/(\{{3})(\#\!)(\w+)/, {
                     cases: {
-                        '$3==html': {token: 'keyword', next: '@embeddedHtml', nextEmbedded: 'html'},
-                        '$3==wiki': {token: 'keyword'},
-                        '@default': {token: 'keyword', next: '@embeddedPlain', nextEmbedded: 'text'}
+                        '$3==syntax': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeSyntax.$3', bracket: '@open'}],
+                        '$3==html': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'html', bracket: '@open'}],
+                        '$3==wiki': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
+                        '@default': ['keyword', 'white', {token: 'white', switchTo: '@code', bracket: '@open'}],
                     }
                 }],
+                [/\{{3}/, {token: 'keyword', next: '@code', bracket: '@open'}],
                 [/\}{3}/, {token: 'keyword', bracket: '@close'}],
 
                 /* 기타 텍스트 속성 */
                 [/(\'{3}).*?\'{3}/, 'strong'],
                 [/(\'{2}).*?\'{2}/, 'emphasis']
             ],
-            embeddedHtml: [
-                [/\}{3}/, {token: '@rematch', next: '@pop', nextEmbedded: '@pop'}],
+            code: [
+                [/\{{3}/, {token: 'white', next: '@codeInDepth', bracket: '@open'}],
+                [/\}{3}/, {token: '@rematch', next: '@pop', bracket: '@close'}],
             ],
-            embeddedPlain: [
+            codeInDepth: [
+                [/\{{3}/, {token: 'white', next: '@codeInDepth', bracket: '@open'}],
+                [/\}{3}/, {token: 'white', next: '@pop', bracket: '@close'}],
+            ],
+            codeSyntax: [
+                [/\s+(\w+)/, {
+                    cases: {
+                        '@default': {token: 'attribute.value', next: '@codeWithType.$1', nextEmbedded: '$1'}
+                    }
+                }],
+                [/\}{3}/, {token: '@rematch', next: '@pop'/*, nextEmbedded: '@pop'*/}],
+            ],
+            codeWiki: [
+                [/\}{3}/, {token: '@rematch', next: '@pop'}],
+                {include: '@root'}
+            ],
+            codeWithType: [
                 [/\}{3}/, {token: '@rematch', next: '@pop', nextEmbedded: '@pop'}],
             ]
         }
