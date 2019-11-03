@@ -116,6 +116,7 @@ export default function(monaco) {
                         '@default': ['keyword', 'white', {token: 'white', switchTo: '@code', bracket: '@open'}],
                     }
                 }],
+                [/(\{{3})(\+|\-)([0-9]+)/, ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}]],
                 [/\{{3}/, {token: 'keyword', next: '@code', bracket: '@open'}],
                 [/\}{3}/, {token: 'keyword', bracket: '@close'}],
 
