@@ -113,6 +113,7 @@ export default function(monaco) {
                         '$3==syntax': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeSyntax.$3', bracket: '@open'}],
                         '$3==html': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'html', bracket: '@open'}],
                         '$3==wiki': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
+                        '$3==folding': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
                         '@default': ['keyword', 'white', {token: 'white', switchTo: '@code', bracket: '@open'}],
                     }
                 }],
