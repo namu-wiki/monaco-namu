@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-define(['vs/editor/editor.main'], () => {
+export default function() {
     monaco.languages.register({
         id: 'namumark',
         aliases: [
@@ -123,4 +123,4 @@ define(['vs/editor/editor.main'], () => {
             ]
         }
     });
-});
+}
