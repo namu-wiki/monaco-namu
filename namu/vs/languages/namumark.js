@@ -41,7 +41,7 @@ export default function(monaco) {
         ],
         wordPattern: /(-?\d.\d\w)|([^`~!@#%^&*()-=+\[{\]}\|;:'",.<>/?\s]+)/g,
     });
-    window.LinkResolver = {
+    monaco.languages.registerLinkProvider('namumark', {
         provideLinks:function(TextModel, _) {
             let ResolvedLinks = [];
             let LineIndex, LineCount;
@@ -78,8 +78,7 @@ export default function(monaco) {
                 dispose:()=>{ }
             };
         }
-    };
-    monaco.languages.registerLinkProvider('namumark', window.LinkResolver);
+    });
     monaco.languages.setMonarchTokensProvider('namumark', {
         defaultToken: '',
         tokenPostfix: '.namumark',
@@ -141,7 +140,7 @@ export default function(monaco) {
                         '@default': {token: 'attribute.value', next: '@codeWithType.$1', nextEmbedded: '$1'}
                     }
                 }],
-                [/\}{3}/, {token: '@rematch', next: '@pop'/*, nextEmbedded: '@pop'*/}],
+                [/\}{3}/, {token: '@rematch', next: '@pop'}],
             ],
             codeWiki: [
                 [/\}{3}/, {token: '@rematch', next: '@pop'}],
