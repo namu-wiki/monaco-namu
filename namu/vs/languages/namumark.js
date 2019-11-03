@@ -56,7 +56,7 @@ define(['vs/editor/editor.main'], () => {
                         ResolvedLinks.push({
                             range: new monaco.Range(LineIndex,LineURI.index+1,LineIndex,LineURI.index+1+LineURI[0].length),
                             tooltip: LineURI[2],
-                            uri: LineURI[0]
+                            url: LineURI[0]
                         });
                     }
                 }
@@ -68,7 +68,7 @@ define(['vs/editor/editor.main'], () => {
                         ResolvedLinks.push({
                             range: new monaco.Range(LineIndex,LineWiki.index+1+LineWiki[1].length,LineIndex,LineWiki.index+1+LineWiki[0].length),
                             tooltip: LineWiki[2],
-                            uri: `https://namu.wiki/w/${encodeURIComponent(LineWiki[2])}`
+                            url: `https://namu.wiki/w/${encodeURIComponent(LineWiki[2])}`
                         });
                     }
                 }
