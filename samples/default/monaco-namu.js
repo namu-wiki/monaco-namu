@@ -32,12 +32,11 @@
                 renderWhitespace: 'all',
                 fontFamily: 'D2Coding, Consolas, "나눔고딕코딩", "Courier New", monospace',
                 value:[
-                    '{{{{{{{{{코드}}}}}}}}}',
+                    '{{{{{{{{{\'\'\'다중 이스케이프\'\'\'}}}}}}}}}',
                     '\'\'\'굵게\'\'\'',
-                    '{{{#!wiki',
+                    '{{{#!wiki style="background-color: red"',
                     '\'\'\'굵게\'\'\'',
-                    '\'\'기울임\'\'',
-                    '}}}',
+                    '\'\'기울임\'\'}}}',
                     '\'\'기울임\'\'',
                     '{{{#!html',
                     '<!-- html madness -->',
@@ -56,6 +55,10 @@
                     '</div>',
                     '}}}',
                     '\'\'\'굵게\'\'\'',
+                    '[[문서|\'\'\'굵은링크\'\'\']]',
+                    '[[문서|{{{#!wiki style="background-color: yellow"',
+                    '위키박스 블록 링크}}}]]',
+                    '[[문서|[[파일:image.png]]]]',
                 ].join('\n')
             });
             target.querySelector('textarea').style.display = 'none';
