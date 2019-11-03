@@ -99,7 +99,7 @@ define(['vs/editor/editor.main'], () => {
                 [/^\s*-{4,9}\s*$/, 'meta.separator'],
 
                 /* 링크 */
-                [/(\[\[)(.*?)(\|)(.*?)(\]\])/, ['keyword', 'string.link', 'keyword', 'string', 'keyword']],
+                [/(\[\[)(.*?)(\|?)(.*?)(\]\])/, ['keyword', 'string.link', 'keyword', 'string', 'keyword']],
 
                 /* 그거 */
                 [/(\{{3})(?:(\#\!)(\w+))?/, {
