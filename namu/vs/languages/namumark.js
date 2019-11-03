@@ -99,7 +99,13 @@ export default function() {
                 [/^\s*-{4,9}\s*$/, 'meta.separator'],
 
                 /* 링크 */
-                [/(\[\[)(.*?)(\|?)(.*?)(\]\])/, ['keyword', 'string.link', 'keyword', 'string', 'keyword']],
+                [/(\[{2})(.*?)(\|?)/, {
+                    cases: {
+                        '$3==|': [{token: 'keyword', bracket: '@open'}, 'string.link', {token: 'keyword', next: '@link'}],
+                        '@default': [{token: 'keyword', bracket: '@open'}, 'string.link', 'keyword'],
+                    }
+                }],
+                [/\]{2}/, {token: 'keyword', bracket: '@close'}],
 
                 /* code */
                 [/(\{{3})(\#\!)(\w+)/, {
@@ -116,6 +122,9 @@ export default function() {
                 /* 기타 텍스트 속성 */
                 [/(\'{3}).*?\'{3}/, 'strong'],
                 [/(\'{2}).*?\'{2}/, 'emphasis']
+            ],
+            link: [
+                [/\]{2}/, {token: '@rematch', next: '@pop'}],
             ],
             code: [
                 [/\{{3}/, {token: 'white', next: '@codeInDepth', bracket: '@open'}],
