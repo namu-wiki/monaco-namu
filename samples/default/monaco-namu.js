@@ -24,7 +24,7 @@
         });
         require(['vs/editor/editor.main', 'namu/toolbar/quickaccess'], async () => {
             const {default: namumark_register} = await import('../../namu/vs/languages/namumark.js');
-            namumark_register();
+            namumark_register(monaco);
             window.monaco_namu = monaco.editor.create(target, {
                 language: 'namumark',
                 automaticLayout: true,
