@@ -28,6 +28,7 @@
                 automaticLayout: true,
                 // renderWhitespace: 'all',
                 fontFamily: 'D2Coding, Consolas, "Courier New", monospace',
+                wordWrap: true,
                 value:[
                     '## formatting syntax',
                     '__underline__',
