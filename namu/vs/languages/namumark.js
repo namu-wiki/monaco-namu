@@ -222,7 +222,7 @@ export default function(monaco) {
                 [/\(/, {token: 'delimiter', next: '@macroArguments', bracket: '@open'}],
                 [/\)/, {token: 'delimiter', bracket: '@close'}],
                 [/math/, {token: 'tag', next: '@macroArgumentWithType.latex'}],
-                [/date|br|include|목차|tableofcontents|각주|footnote|pagecount|age|dday|ruby|math|youtube|kakaotv|nicovideo/i, 'tag'],
+                [/date|br|include|목차|tableofcontents|각주|footnote|pagecount|age|dday|ruby|anchor|math|youtube|kakaotv|nicovideo/i, 'tag'],
                 [/./, 'invalid'],
             ],
             macroArgumentWithType: [
