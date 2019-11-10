@@ -101,7 +101,6 @@ export default function(monaco) {
                             );
                             tooltip = `${LineWiki[4]}:${LineWiki[5]}`;
                             url = VideoURIFormatter(LineWiki[4], LineWiki[5]);
-                            console.log(url);
                             break;
                         case 'include':
                             /* 재정렬 */
@@ -178,7 +177,7 @@ export default function(monaco) {
                 [/^\s*-{4,9}\s*$/, 'meta.separator'],
 
                 /* 링크 */
-                [/\[{2}/, {token: 'string.link', bracket: '@open', next: '@link', log: 'link match'}],
+                [/\[{2}/, {token: 'string.link', bracket: '@open', next: '@link'}],
                 [/\]{2}/, {token: 'string.link', bracket: '@close'}],
 
                 /* code */
@@ -202,7 +201,7 @@ export default function(monaco) {
             link: [
                 [/\\[\]]/, 'string.escape'],
                 [/\]{2}|\n/, {token: '@rematch', next: '@pop', bracket: '@close'}],
-                [/\|/, {token: 'string.link', next: '@linkText', log: 'linkText matched'}],
+                [/\|/, {token: 'string.link', next: '@linkText'}],
                 [/[^\\\|\]\n]+/, 'string.link'],
             ],
             linkText: [
