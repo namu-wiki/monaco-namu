@@ -64,7 +64,7 @@ export default function(monaco) {
             LineCount = TextModel.getLineCount();
             for(LineIndex = 1;LineIndex <= LineCount;LineIndex++) {
                 let LineContent = TextModel.getLineContent(LineIndex);
-                let LineWikiRegExp = /(\[\[)([^\]\|]+)|(\[(include|youtube|nicovideo)\()([^\)\],]+)/g;
+                let LineWikiRegExp = /(\[\[)((?:\\.|[^\]\|])+)|(\[(include|youtube|nicovideo|kakaotv)\()((?:\\.|[^,])+)(?:,.*?)?\)\]/g;
                 let URIRegExp = /(\w+)\:\/\/(?:www\.)?([^\s\|\]\'\"]+)/g;
                 let LineWiki;
                 while(null != (LineWiki = LineWikiRegExp.exec(LineContent))) {
@@ -91,6 +91,7 @@ export default function(monaco) {
                         case 'youtube':
                         case 'kakaotv':
                         case 'nicovideo':
+                            LineWiki[0] = LineWiki[3] + LineWiki[5];
                             range = new monaco.Range(
                                 LineIndex,
                                 LineWiki.index+1+LineWiki[3].length,
@@ -102,6 +103,7 @@ export default function(monaco) {
                             break;
                         case 'include':
                             /* 재정렬 */
+                            LineWiki[0] = LineWiki[3] + LineWiki[5];
                             LineWiki[1] = LineWiki[1] || LineWiki[3];
                             LineWiki[2] = LineWiki[2] || LineWiki[5];
                             LineWiki[3] = LineWiki[4] || null;
@@ -118,7 +120,7 @@ export default function(monaco) {
                                 url = LineURI[0];
                             }
                             else {
-                                if(LineWiki[2].length>1 && LineWiki[2].match(/^:파일:/)) {
+                                if(LineWiki[2].length>1 && LineWiki[2].match(/^:(파일|분류):/)) {
                                     let WikiName = LineWiki[2].substr(1);
                                     range = new monaco.Range(
                                         LineIndex,
@@ -130,7 +132,7 @@ export default function(monaco) {
                                     url = new URL(`/w/${encodeURIComponent(WikiName)}`, window.location.href).href;
                                 }
                                 else {
-                                    let WikiName = LineWiki[2];
+                                    let WikiName = LineWiki[2].replace(/\\(.)/, '$1');
                                     range = new monaco.Range(
                                         LineIndex,
                                         LineWiki.index+1+LineWiki[1].length,
@@ -231,7 +233,7 @@ export default function(monaco) {
             ],
             macroArguments: [
                 [/@escapes/, 'string.escape'],
-                [/\)/, {token: 'delimiter', next: '@pop', bracket: '@close'}],
+                [/\)\]/, {token: '@rematch', next: '@pop', bracket: '@close'}],
                 [/=/, {token: 'delimiter', next: '@macroArgumentsItem'}],
                 [/,/, {token: 'delimiter'}],
                 [/./, 'attribute.name'],
