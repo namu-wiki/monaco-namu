@@ -66,28 +66,91 @@ export default function(monaco) {
             LineCount = TextModel.getLineCount();
             for(LineIndex = 1;LineIndex <= LineCount;LineIndex++) {
                 let LineContent = TextModel.getLineContent(LineIndex);
+                let LineWikiRegExp = /(\[\[)([^\]\|]+)|(\[(include|youtube|nicovideo)\()([^\)\],]+)/g;
                 let URIRegExp = /(\w+)\:\/\/(?:www\.)?([^\s\|\]\'\"]+)/g;
-                /* URI */ {
+                let LineWiki;
+                while(null != (LineWiki = LineWikiRegExp.exec(LineContent))) {
+                    let range, tooltip, url;
                     let LineURI;
-                    while(null != (LineURI = URIRegExp.exec(LineContent))) {
-                        ResolvedLinks.push({
-                            range: new monaco.Range(LineIndex,LineURI.index+1,LineIndex,LineURI.index+1+LineURI[0].length),
-                            tooltip: LineURI[2],
-                            url: LineURI[0]
-                        });
+                    let VideoURIFormatter = (ServiceId, VideoId) => {
+                        switch(ServiceId) {
+                            case 'youtube':
+                                return `https://www.youtube.com/watch?v=${VideoId}`;
+                                break;
+                            case 'kakaotv':
+                                return `https://tv.kakao.com/v/${VideoId}`;
+                                break;
+                            case 'nicovideo':
+                                return `https://www.nicovideo.jp/watch/${VideoId}`;
+                                break;
+                            default:
+                                console.warn(`VideoURIFormatter: Undefined ServiceId "${ServiceId}"`);
+                                return;
+                        }
+                    };
+
+                    switch(LineWiki[4]) {
+                        case 'youtube':
+                        case 'kakaotv':
+                        case 'nicovideo':
+                            range = new monaco.Range(
+                                LineIndex,
+                                LineWiki.index+1+LineWiki[3].length,
+                                LineIndex,
+                                LineWiki.index+1+LineWiki[0].length
+                            );
+                            tooltip = `${LineWiki[4]}:${LineWiki[5]}`;
+                            url = VideoURIFormatter(LineWiki[4], LineWiki[5]);
+                            console.log(url);
+                            break;
+                        case 'include':
+                            /* 재정렬 */
+                            LineWiki[1] = LineWiki[1] || LineWiki[3];
+                            LineWiki[2] = LineWiki[2] || LineWiki[5];
+                            LineWiki[3] = LineWiki[4] || null;
+                            LineWiki[4] = LineWiki[5] = null;
+                        default:
+                            if(LineURI = URIRegExp.exec(LineWiki[2])) {
+                                range = new monaco.Range(
+                                    LineIndex,
+                                    LineWiki.index+1+LineWiki[1].length,
+                                    LineIndex,
+                                    LineWiki.index+1+LineWiki[0].length
+                                );
+                                tooltip = LineURI[2];
+                                url = LineURI[0];
+                            }
+                            else {
+                                if(LineWiki[2].length>1 && LineWiki[2].match(/^:파일:/)) {
+                                    let WikiName = LineWiki[2].substr(1);
+                                    range = new monaco.Range(
+                                        LineIndex,
+                                        LineWiki.index+1+LineWiki[1].length+1,
+                                        LineIndex,
+                                        LineWiki.index+1+LineWiki[0].length
+                                    );
+                                    tooltip = WikiName;
+                                    url = new URL(`/w/${encodeURIComponent(WikiName)}`, window.location.href).href;
+                                }
+                                else {
+                                    let WikiName = LineWiki[2];
+                                    range = new monaco.Range(
+                                        LineIndex,
+                                        LineWiki.index+1+LineWiki[1].length,
+                                        LineIndex,
+                                        LineWiki.index+1+LineWiki[0].length
+                                    );
+                                    tooltip = WikiName;
+                                    url = new URL(`/w/${encodeURIComponent(WikiName)}`, window.location.href).href;
+                                }
+                            }
                     }
-                }
-                /* wiki link */ {
-                    let LineWikiRegExp = /(\[\[)([^\]\|]+)/g;
-                    let LineWiki;
-                    while(null != (LineWiki = LineWikiRegExp.exec(LineContent))) {
-                        if(URIRegExp.test(LineWiki[2])) continue;
-                        ResolvedLinks.push({
-                            range: new monaco.Range(LineIndex,LineWiki.index+1+LineWiki[1].length,LineIndex,LineWiki.index+1+LineWiki[0].length),
-                            tooltip: LineWiki[2],
-                            url: new URL(`/w/${encodeURIComponent(LineWiki[2])}`, window.location.href).href
-                        });
-                    }
+
+                    ResolvedLinks.push({
+                        range: range,
+                        tooltip: tooltip,
+                        url: url
+                    });
                 }
             }
             return {
