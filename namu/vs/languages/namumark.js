@@ -115,13 +115,8 @@ export default function(monaco) {
                 [/^\s*-{4,9}\s*$/, 'meta.separator'],
 
                 /* 링크 */
-                [/(\[{2})(.*?)(\|?)/, {
-                    cases: {
-                        '$3==|': [{token: 'keyword', bracket: '@open'}, 'string.link', {token: 'keyword', next: '@link'}],
-                        '@default': [{token: 'keyword', bracket: '@open'}, 'string.link', 'keyword'],
-                    }
-                }],
-                [/\]{2}/, {token: 'keyword', bracket: '@close'}],
+                [/\[{2}/, {token: 'string.link', bracket: '@open', next: '@link', log: 'link match'}],
+                [/\]{2}/, {token: 'string.link', bracket: '@close'}],
 
                 /* code */
                 [/(\{{3})(\#\!)(\w+)/, {
@@ -142,7 +137,14 @@ export default function(monaco) {
                 [/(\'{2}).*?\'{2}/, 'emphasis']
             ],
             link: [
-                [/\]{2}/, {token: '@rematch', next: '@pop'}],
+                [/\\[\]]/, 'string.escape'],
+                [/\]{2}|\n/, {token: '@rematch', next: '@pop', bracket: '@close'}],
+                [/\|/, {token: 'string.link', next: '@linkText', log: 'linkText matched'}],
+                [/[^\\\|\]\n]+/, 'string.link'],
+            ],
+            linkText: [
+                [/\]{2}/, {token: '@rematch', next: '@pop', bracket: '@close'}],
+                {include: '@root'}
             ],
             code: [
                 [/\{{3}/, {token: 'white', next: '@codeInDepth', bracket: '@open'}],
