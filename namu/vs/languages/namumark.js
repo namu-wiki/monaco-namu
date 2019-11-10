@@ -271,6 +271,13 @@ export default function(monaco) {
             ],
             codeWiki: [
                 [/\}{3}/, {token: '@rematch', next: '@pop'}],
+                [/[\w\-]+/, {cases: {'@eos':{token: 'attribute.name', next: '@codeWikiContent'}, '@default':'attribute.name'}}],
+                [/=/, {cases: {'@eos':{token: 'delimiter', next: '@codeWikiContent'}, '@default':'delimiter'}}],
+                [/"[^"]*"/, {cases: {'@eos':{token: 'attribute.value', next: '@codeWikiContent'}, '@default':'attribute.value'}}],
+                [/./, {cases: {'@eos':{token: 'white', next: '@codeWikiContent'}}}],
+            ],
+            codeWikiContent: [
+                [/\}{3}/, {token: '@rematch', next: '@pop'}],
                 {include: '@root'}
             ],
             codeWithType: [
