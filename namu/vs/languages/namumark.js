@@ -29,8 +29,7 @@ export default function(monaco) {
             lineComment: '##'
         },
         brackets: [
-            ['{', '}'],
-            // ['[[', ']]'],
+            ['{{{', '}}}'],
             ['[', ']'],
             ['(', ')'],
         ],
@@ -49,7 +48,6 @@ export default function(monaco) {
             {open: '{', close: '}'},
             {open: '[', close: ']'},
             {open: '(', close: ')'},
-            {open: '\'\'\'', close: '\'\'\''},
             {open: '~~', close: '~~'},
             {open: '--', close: '--'},
             {open: '__', close: '__'},
@@ -161,7 +159,7 @@ export default function(monaco) {
     monaco.languages.setMonarchTokensProvider('namumark', {
         defaultToken: '',
         tokenPostfix: '.namumark',
-    
+        escapes: /\\./,
         tokenizer: {
             root: [
                 /* 문단 */
@@ -177,14 +175,22 @@ export default function(monaco) {
                 [/^\s*-{4,9}\s*$/, 'meta.separator'],
 
                 /* 링크 */
-                [/\[{2}/, {token: 'string.link', bracket: '@open', next: '@link'}],
-                [/\]{2}/, {token: 'string.link', bracket: '@close'}],
+                [/\[{2}/, {token: 'delimiter', bracket: '@open', next: '@link'}],
+                [/\]{2}/, {token: 'delimiter', bracket: '@close'}],
+
+                /* 각주 */
+                [/(\[)(\*)/, ['delimiter', {token: 'comment', bracket: '@open', next: '@reference'}]],
+
+                /* 매크로 */
+                [/\[/, {token: 'delimiter', bracket: '@open', next: '@macro'}],
+                [/\]/, {token: 'delimiter', bracket: '@close'}],
 
                 /* code */
                 [/(\{{3})(\#\!)(\w+)/, {
                     cases: {
                         '$3==syntax': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeSyntax.$3', bracket: '@open'}],
                         '$3==html': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'html', bracket: '@open'}],
+                        '$3==latex': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'latex', bracket: '@open'}],
                         '$3==wiki': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
                         '$3==folding': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
                         '@default': ['keyword', 'white', {token: 'white', switchTo: '@code', bracket: '@open'}],
@@ -196,15 +202,54 @@ export default function(monaco) {
 
                 /* 기타 텍스트 속성 */
                 [/(\'{3}).*?\'{3}/, 'strong'],
-                [/(\'{2}).*?\'{2}/, 'emphasis']
+                [/(\'{2}).*?\'{2}/, 'emphasis'],
+            ],
+            reference: [
+                [/\s+/, {token: 'white', next: '@referenceContent'}],
+                [/\]/, {token: 'delimiter', next: '@pop', bracket: '@close'}],
+                [/./, 'attribute.value'],
+            ],
+            referenceContent: [
+                [/\]/, {token: '@rematch', next: '@pop', bracket: '@close'}],
+                {include: '@root'}
+            ],
+            macro: [
+                [/@escapes/, 'string.escape'],
+                [/\]/, {token: 'delimiter', next: '@pop', bracket: '@close'}],
+                [/\(/, {token: 'delimiter', next: '@macroArguments', bracket: '@open'}],
+                [/\)/, {token: 'delimiter', bracket: '@close'}],
+                [/math/, {token: 'tag', next: '@macroArgumentWithType.latex'}],
+                [/date|br|include|목차|tableofcontents|각주|footnote|pagecount|age|dday|ruby|math|youtube|kakaotv|nicovideo/i, 'tag'],
+                [/./, 'invalid'],
+            ],
+            macroArgumentWithType: [
+                [/\(/, {token: 'delimiter', next: '@macroEmbedded', nextEmbedded: '$S2', bracket: '@open'}],
+                [/\)\]/, {token: '@rematch', next: '@pop', bracket: '@close'}],
+            ],
+            macroEmbedded: [
+                [/\)\]/, {token: '@rematch', next: '@pop', nextEmbedded: '@pop', bracket: '@close'}],
+            ],
+            macroArguments: [
+                [/@escapes/, 'string.escape'],
+                [/\)/, {token: 'delimiter', next: '@pop', bracket: '@close'}],
+                [/=/, {token: 'delimiter', next: '@macroArgumentsItem'}],
+                [/,/, {token: 'delimiter'}],
+                [/./, 'attribute.name'],
+            ],
+            macroArgumentsItem: [
+                [/@escapes/, 'string.escape'],
+                [/\)/, {token: '@rematch', next: '@pop'}],
+                [/,/, {token: 'delimiter', next: '@pop'}],
+                [/./, 'attribute.value'],
             ],
             link: [
-                [/\\[\]]/, 'string.escape'],
-                [/\]{2}|\n/, {token: '@rematch', next: '@pop', bracket: '@close'}],
-                [/\|/, {token: 'string.link', next: '@linkText'}],
-                [/[^\\\|\]\n]+/, 'string.link'],
+                [/@escapes/, 'string.escape'],
+                [/\]{2}/, {token: '@rematch', next: '@pop', bracket: '@close'}],
+                [/\|/, {token: 'delimiter', next: '@linkText'}],
+                [/[^\\\|\]]+/, 'string.link'],
             ],
             linkText: [
+                [/\[{2}/, {token: 'delimiter', bracket: '@open', next: '@link'}],
                 [/\]{2}/, {token: '@rematch', next: '@pop', bracket: '@close'}],
                 {include: '@root'}
             ],
