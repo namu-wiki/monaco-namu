@@ -129,7 +129,7 @@ export default function(monaco) {
                                         LineWiki.index+1+LineWiki[0].length
                                     );
                                     tooltip = WikiName;
-                                    url = new URL(`/w/${encodeURIComponent(WikiName)}`, window.location.href).href;
+                                    url = window.location.protocol + '//' + window.location.host + '/w/' + encodeURIComponent(WikiName);
                                 }
                                 else {
                                     let WikiName = LineWiki[2].replace(/\\(.)/, '$1');
@@ -140,7 +140,7 @@ export default function(monaco) {
                                         LineWiki.index+1+LineWiki[0].length
                                     );
                                     tooltip = WikiName;
-                                    url = new URL(`/w/${encodeURIComponent(WikiName)}`, window.location.href).href;
+                                    url = window.location.protocol + '//' + window.location.host + '/w/' + encodeURIComponent(WikiName);
                                 }
                             }
                     }
