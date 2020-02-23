@@ -164,6 +164,9 @@ export default function(monaco) {
         escapes: /\\./,
         tokenizer: {
             root: [
+                /* escapes */
+                [/@escapes/, 'string.escape'],
+
                 /* 문단 */
                 [/^(={1,6})(#?)(\s.+\s)(#?)(\1)(\s*)$/, 'keyword'],
 
@@ -193,19 +196,37 @@ export default function(monaco) {
                         '$3==syntax': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeSyntax.$3', bracket: '@open'}],
                         '$3==html': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'html', bracket: '@open'}],
                         '$3==latex': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWithType.$3', nextEmbedded: 'latex', bracket: '@open'}],
-                        '$3==wiki': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
-                        '$3==folding': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}],
-                        '@default': ['keyword', 'white', {token: 'white', switchTo: '@code', bracket: '@open'}],
+                        '$3==wiki': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWikiAttributes', bracket: '@open'}],
+                        '$3==folding': ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWikiAttributes', bracket: '@open'}],
+                        '@default': ['keyword', 'white', {token: 'white', next: '@code', bracket: '@open'}],
                     }
                 }],
-                [/(\{{3})(\+|\-)([0-9]+)/, ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}]],
+                [/(\{{3})(\+|\-)([0-9]+)/, ['keyword', 'delimiter', {token: 'attribute.value', next: '@codeWiki', bracket: '@open'}]],
                 [/(\{{3})(#)(aliceblue|antiquewhite|aqua|aquamarine|azure|beige|bisque|black|blanchedalmond|blue|blueviolet|brown|burlywood|cadetblue|chartreuse|chocolate|coral|cornflowerblue|cornsilk|crimson|cyan|darkblue|darkcyan|darkgoldenrod|darkgray|darkgreen|darkgrey|darkkhaki|darkmagenta|darkolivegreen|darkorange|darkorchid|darkred|darksalmon|darkseagreen|darkslateblue|darkslategray|darkslategrey|darkturquoise|darkviolet|deeppink|deepskyblue|dimgray|dimgrey|dodgerblue|firebrick|floralwhite|forestgreen|fuchsia|gainsboro|ghostwhite|gold|goldenrod|gray|green|greenyellow|grey|honeydew|hotpink|indianred|indigo|ivory|khaki|lavender|lavenderblush|lawngreen|lemonchiffon|lightblue|lightcoral|lightcyan|lightgoldenrodyellow|lightgray|lightgreen|lightgrey|lightpink|lightsalmon|lightseagreen|lightskyblue|lightslategray|lightslategrey|lightsteelblue|lightyellow|lime|limegreen|linen|magenta|maroon|mediumaquamarine|mediumblue|mediumorchid|mediumpurple|mediumseagreen|mediumslateblue|mediumspringgreen|mediumturquoise|mediumvioletred|midnightblue|mintcream|mistyrose|moccasin|navajowhite|navy|oldlace|olive|olivedrab|orange|orangered|orchid|palegoldenrod|palegreen|paleturquoise|palevioletred|papayawhip|peachpuff|peru|pink|plum|powderblue|purple|rebeccapurple|red|rosybrown|royalblue|saddlebrown|salmon|sandybrown|seagreen|seashell|sienna|silver|skyblue|slateblue|slategray|slategrey|snow|springgreen|steelblue|tan|teal|thistle|tomato|turquoise|violet|wheat|white|whitesmoke|yellow|yellowgreen|[0-9a-f]{3}|[0-9a-f]{6})(\s)/, ['keyword', 'attribute.value', {token: 'attribute.value', next: '@codeWiki.$3', bracket: '@open'}, 'white']],
                 [/\{{3}/, {token: 'keyword', next: '@code', bracket: '@open'}],
                 [/\}{3}/, {token: 'keyword', bracket: '@close'}],
 
                 /* 기타 텍스트 속성 */
-                [/(\'{3}).*?\'{3}/, 'strong'],
-                [/(\'{2}).*?\'{2}/, 'emphasis'],
+                [/\'{3}/, {
+                    cases: {
+                        '$S2==strong': {token: 'strong', next: '@pop', bracket: '@close'},
+                        '@default': {token: 'strong', next: '@root.strong', bracket: '@open'},
+                    }
+                }],
+                [/\'{2}/, {
+                    cases: {
+                        '$S2==emphasis': {token: 'emphasis', next: '@pop', bracket: '@close'},
+                        '@default': {token: 'emphasis', next: '@root.emphasis', bracket: '@open'},
+                    }
+                }],
+                [/.$/, {
+                    cases: {
+                        '$S2==strong': {token: '$S2', next: '@pop', bracket: '@close'},
+                        '$S2==emphasis': {token: '$S2', next: '@pop', bracket: '@close'},
+                        '@default': {token: 'white'},
+                    }
+                }],
+                [/./, {token:'$S2'}],
             ],
             reference: [
                 [/\s+/, {token: 'white', next: '@referenceContent'}],
@@ -271,6 +292,15 @@ export default function(monaco) {
                     }
                 }],
                 [/\}{3}/, {token: '@rematch', next: '@pop'}],
+            ],
+            codeWikiAttributes: [
+                [/\}{3}/, {token: '@rematch', next: '@pop'}],
+                [/(\w+)(\=)(\")([^\"]*?|@escapes)(\")(\s*)$/, ['attribute.name', 'white', 'white', 'attribute.value', {token: 'white', next: '@codeWiki'}, 'white']],
+                [/(\w+)(\=)(\')([^\']*?|@escapes)(\')(\s*)$/, ['attribute.name', 'white', 'white', 'attribute.value', {token: 'white', next: '@codeWiki'}, 'white']],
+                [/(\w+)(\=)(\")([^\"]*?|@escapes)(\")/, ['attribute.name', 'white', 'white', 'attribute.value', 'white']],
+                [/(\w+)(\=)(\')([^\']*?|@escapes)(\')/, ['attribute.name', 'white', 'white', 'attribute.value', 'white']],
+                [/.$/, {token: 'invalid', next: '@codeWiki'}],
+                [/./, 'invalid'],
             ],
             codeWiki: [
                 [/\}{3}/, {token: '@rematch', next: '@pop'}],
