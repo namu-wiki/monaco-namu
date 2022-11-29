@@ -65,7 +65,7 @@ export default function(monaco) {
             for(LineIndex = 1;LineIndex <= LineCount;LineIndex++) {
                 let LineContent = TextModel.getLineContent(LineIndex);
                 let LineWikiRegExp = /(\[\[)((?:\\.|[^\]\|])+)|(\[(include|youtube|nicovideo|kakaotv)\()((?:\\.|[^,])+?)(?:,.*?)?\)\]/g;
-                let URIRegExp = /(\w+)\:\/\/(?:www\.)?([^\s\|\]\'\"]+)/g;
+                let URIRegExp = /(\w+)\:\/\/(?:www\.)?([^\s\|\]\'\"]+)/;
                 let LineWiki;
                 while(null != (LineWiki = LineWikiRegExp.exec(LineContent))) {
                     let range, tooltip, url;
